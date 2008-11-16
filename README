@@ -1,0 +1,3 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=2445
+
+This script help you to update automatically the serial of SOA when editing a DNS zone with vim. It find the serial, increment or update with the current time as : YYYYMMDDNU where YYYY=year, MM: month, DD:day, NU:number version.
