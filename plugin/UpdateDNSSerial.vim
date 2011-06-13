@@ -1,27 +1,32 @@
+" This function is used to update the serial in the SOA from a bind file
 function! UpdateDNSSerialZone()
-        " Initialisation des variables
-        let serialZone=0
-        let serialZoneUpdated=0
-        "Numéro de ligne du timestamp
-        let numberOfLine = search(".*".strftime("%Y")."[1-12][1-31][0-99].*")
-        "Récupération de la ligne du timestamp DNS
-        let line = getline(numberOfLine)
-        "Extraction du serial de la zone dans la ligne
-        let serialZone=strpart(line, match(line,strftime("%Y")."[1-12][1-31][0-99].*"),match(line,";")-1-match(line,,strftime("%Y")."[1-12][1-31][0-99].*"))
-        "Composition du nouveau serial par défaut pour le jour
-        let serialZoneUpdated=strftime("%Y%m%d")."01"
+	" Initialisation des variables
+	let serialZone=0
+	let serialZoneUpdated=0
+	"Search for a line that start with a year and contains the word Serial
+	let numberOfLine = search('\(19\|20\)\d\d\(0[1-9]\|1[012]\)\(0[1-9]\|[12][0-9]\|3[01]\)\d\d.*Serial.*')
+	if numberOfLine == 0
+		echo "No bind serial found ! so not updating the file"
+	else
+
+		"Get the line contents 
+		let line = getline(numberOfLine)
+		"Extract the serial number	
+		let serialZone=strpart(line, match(line,'\(19\|20\)\d\d\(0[1-9]\|1[012]\)\(0[1-9]\|[12][0-9]\|3[01]\)'),match(line,";")-1-match(line,'\(19\|20\)\d\d\(0[1-9]\|1[012]\)\(0[1-9]\|[12][0-9]\|3[01]\)'))
+
+		" Create a new server number for today
+		let serialZoneUpdated=strftime("%Y%m%d")."01"
        
 
-        "Comparaison des serials
-        if serialZone =~ "^".strftime("%Y%m%d").".*"
-                " Si date du jour, on incrémente
-                let serialZoneUpdated=serialZone+1
-                "echo "1 Old serial zone: ".serialZone
-                "echo "1 Update serial zone: ".serialZoneUpdated
-        endif
-        "Nouvelle ligne à insérer
-        let line = "                                    ".serialZoneUpdated." ;serial"
-        "Modification de la ligne
-        call setline(numberOfLine, line)
+		" If the found serial date matches the one from today then we have to
+		" increment
+		if serialZone =~ "^.*".strftime("%Y%m%d").".*"
+			let serialZoneUpdated=serialZone+1
+		endif
+		" Build a new line with the updated serial
+		let line = "\t".serialZoneUpdated."\t; Serial (YYYYMMDD##)"
+		" Write the line back to the file
+		call setline(numberOfLine, line)
+		echo "Old serial = \"".serialZone."\" updated serial to = \"".serialZoneUpdated."\""
+	endif
 endfunction
-
