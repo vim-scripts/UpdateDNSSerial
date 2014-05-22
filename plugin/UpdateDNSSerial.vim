@@ -4,7 +4,7 @@ function! UpdateDNSSerialZone()
 	let serialZone=0
 	let serialZoneUpdated=0
 	"Search for a line that start with a year and contains the word Serial
-	let numberOfLine = search('\(19\|20\)\d\d\(0[1-9]\|1[012]\)\(0[1-9]\|[12][0-9]\|3[01]\)\d\d.*Serial.*')
+	let numberOfLine = search('\(19\|20\)\d\d\(0[1-9]\|1[012]\)\(0[1-9]\|[12][0-9]\|3[01]\)\d\d.*[Ss]erial.*')
 	if numberOfLine == 0
 		echo "No bind serial found ! so not updating the file"
 	else
